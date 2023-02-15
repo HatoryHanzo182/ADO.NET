@@ -1,17 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Data.SqlClient;  // NuGet(System.Data.SqlClient).
 using System.IO;
 
@@ -22,14 +11,14 @@ namespace ADO.NET
         private SqlConnection _connection;  // Connection object (The basis ADO).
 
         public MainWindow()
-        {
+        {   
             InitializeComponent();
 
-            _connection = new SqlConnection() { ConnectionString = App._connection_string };
+            _connection = new SqlConnection() { ConnectionString = App._connection_string };  // Get connection string from app file.
         }
 
-        private void Window_Loaded(object sender, RoutedEventArgs e)
-        {
+        private void Window_Loaded(object sender, RoutedEventArgs e)  // When loading the window, open a connection to the server, 
+        {                                                            // indicate the connection status, display data.
             try
             {
                 _connection.Open();
@@ -50,107 +39,108 @@ namespace ADO.NET
         }
 
         #region Query and return results.
-        private void Click_CreateDepartments(object sender, RoutedEventArgs e)
+        #region Query create.
+        private void Click_CreateDepartments(object sender, RoutedEventArgs e)  // The method creates a table with departments.
         {
-            SqlCommand cmd = new SqlCommand()  // Passing (SQL) request to DBMS.
-            {
-                Connection = _connection,
-                CommandText = File.ReadAllText("RequestsSQL/RequestNewDepartmentTable.sql")
-            };
-
-            try
-            {
-                cmd.ExecuteNonQuery();  // NoQuery - not return result.
-                MessageBox.Show("Create OK", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
-            }
-            catch (SqlException ex) { MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error); }
-
-            cmd.Dispose();  // Releasing a resource.
-        }
-
-        private void Click_FillDepartments(object sender, RoutedEventArgs e)
-        {
-            SqlCommand cmd = new SqlCommand()
-            {
-                Connection = _connection,
-                CommandText = File.ReadAllText("RequestsSQL/RequestImplementationDepartmentStandardData.sql")
-            };
+            String sql = File.ReadAllText("RequestsSQL/RequestNewDepartmentTable.sql");
+            using SqlCommand cmd = new SqlCommand(sql, _connection);
 
             try
             {
                 cmd.ExecuteNonQuery();
-                MessageBox.Show("Fill OK", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show("Create departments OK", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (SqlException ex) { MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error); }
-
+            
             cmd.Dispose();  // Releasing a resource.
         }
-
-        private void Click_CreateProducts(object sender, RoutedEventArgs e)
+        
+        private void Click_CreateProducts(object sender, RoutedEventArgs e)  // The method creates a table with Products.
         {
             String sql = File.ReadAllText("RequestsSQL/RequestNewProductsTable.sql");
-
             using SqlCommand cmd = new SqlCommand(sql, _connection);
-
+          
             try
             {
                 cmd.ExecuteNonQuery();
                 MessageBox.Show("Create products ok", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex) { MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error); }
+            
+            cmd.Dispose();  // Releasing a resource.
         }
-
-        private void Click_FillProducts(object sender, RoutedEventArgs e)
-        {
-            String sql = File.ReadAllText("RequestsSQL/RequestImplementationProductsStandardData.sql");
-
-            using SqlCommand cmd = new SqlCommand(sql, _connection);
-
-            try
-            {
-                cmd.ExecuteNonQuery();
-                MessageBox.Show("Fill products ok", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
-            }
-            catch (Exception ex) { MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error); }
-        }
-
-        private void Click_CreateManagers(object sender, RoutedEventArgs e)
+          
+        private void Click_CreateManagers(object sender, RoutedEventArgs e)  // The method creates a table with Managers.
         {
             String sql = File.ReadAllText("RequestsSQL/RequestNewManagersTable.sql");
-
             using SqlCommand cmd = new SqlCommand(sql, _connection);
-
+        
             try
             {
                 cmd.ExecuteNonQuery();
                 MessageBox.Show("Fill products ok", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex) { MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error); }
-        }
 
-        private void Click_FillManagers(object sender, RoutedEventArgs e)
-        {
-            String sql = File.ReadAllText("RequestsSQL/RequestImplementationManagersStandardData.sql");
-
-            using SqlCommand cmd = new SqlCommand(sql, _connection);
-
-            try
-            {
-                cmd.ExecuteNonQuery();
-                MessageBox.Show("Fill products ok", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
-            }
-            catch (Exception ex) { MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error); }
+            cmd.Dispose();  // Releasing a resource.
         }
         #endregion
+        #region Query fill
+        private void Click_FillDepartments(object sender, RoutedEventArgs e)  // The method implements filling the Department table with default values using queries.
+        {
+            String sql = File.ReadAllText("RequestsSQL/RequestImplementationDepartmentStandardData.sql");
+            using SqlCommand cmd = new SqlCommand(sql, _connection);
+
+            try
+            {
+                cmd.ExecuteNonQuery();
+                MessageBox.Show("Fill department OK", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (SqlException ex) { MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error); }
+
+            cmd.Dispose();  // Releasing a resource.
+        }
+
+        private void Click_FillProducts(object sender, RoutedEventArgs e)  // The method implements filling the Products table with default values using queries.
+        {
+            String sql = File.ReadAllText("RequestsSQL/RequestImplementationProductsStandardData.sql");
+            using SqlCommand cmd = new SqlCommand(sql, _connection);
+
+            try
+            {
+                cmd.ExecuteNonQuery();
+                MessageBox.Show("Fill products ok", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (Exception ex) { MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error); }
+
+            cmd.Dispose();  // Releasing a resource.
+        }
+
+        private void Click_FillManagers(object sender, RoutedEventArgs e)  // The method implements filling the Managers table with default values using queries.
+        {
+            String sql = File.ReadAllText("RequestsSQL/RequestImplementationManagersStandardData.sql");
+            using SqlCommand cmd = new SqlCommand(sql, _connection);
+
+            try
+            {
+                cmd.ExecuteNonQuery();
+                MessageBox.Show("Fill products ok", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            catch (Exception ex) { MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error); }
+
+            cmd.Dispose();  // Releasing a resource.
+        }
+        #endregion
+        #endregion
         #region Queries with a Single Scalar Result.
-        private void ShowMonitor()
+        private void ShowMonitor()  // The method displays all the data in the table.
         {
             ShowMonitorDepartments();
             ShowMonitorProducts();
             ShowMonitorManagers();
         }
 
-        private void ShowMonitorDepartments()
+        private void ShowMonitorDepartments()  // Get the number of departments for [Status-Monitor].
         {
             using SqlCommand cmd = new SqlCommand(File.ReadAllText("RequestsSQL/RequestCountDeportations.sql"), _connection);
 
@@ -175,7 +165,7 @@ namespace ADO.NET
             }
         }
 
-        private void ShowMonitorProducts()
+        private void ShowMonitorProducts()  // Get the number of products for [Status-Monitor].
         {
             using SqlCommand cmd = new SqlCommand(File.ReadAllText("RequestsSQL/RequestCountDeportations.sql"), _connection);
 
@@ -200,7 +190,7 @@ namespace ADO.NET
             }
         }
 
-        private void ShowMonitorManagers()
+        private void ShowMonitorManagers()  // Get the number of managers for [Status-Monitor].
         {
             using SqlCommand cmd = new SqlCommand(File.ReadAllText("RequestsSQL/RequestCountManager.sql"), _connection);
 
@@ -226,14 +216,14 @@ namespace ADO.NET
         }
         #endregion
         #region Request from tabular results
-        private void Showviews()
+        private void Showviews()  // The method shows the contents of the tables in the database and passes them to the text box.
         {
             ShowDepartmentsView();
             ShowProductsView();
             ShowManagersView();
         }
 
-        private void ShowDepartmentsView()
+        private void ShowDepartmentsView()  // Drawing all departmental data.
         {
             using SqlCommand cmd = new SqlCommand(File.ReadAllText("RequestsSQL/DepartmentPullRequest.sql"), _connection);
 
@@ -246,12 +236,12 @@ namespace ADO.NET
                     str += $"{reader.GetString(0)}  |  {reader[1]}\n";
                 reader.Close();
 
-                ViewDepartments.Text = str;
+                TextBlock_Departments.Text = str;
             }
             catch (Exception ex) { MessageBox.Show(ex.Message, "Output error", MessageBoxButton.OK, MessageBoxImage.Error); }
         }
 
-        private void ShowProductsView()
+        private void ShowProductsView()  // Drawing all product data.
         {
             using SqlCommand cmd = new SqlCommand(File.ReadAllText("RequestsSQL/ProductPullRequest.sql"), _connection);
 
@@ -264,12 +254,12 @@ namespace ADO.NET
                     str += $"{reader.GetString(0)}  |  {reader[1]} \n";
                 reader.Close();
 
-                ViewProducts.Text = str;
+                TextBlock_Products.Text = str;
             }
             catch (Exception ex) { MessageBox.Show(ex.Message, "Output error", MessageBoxButton.OK, MessageBoxImage.Error); }
         }
 
-        private void ShowManagersView()
+        private void ShowManagersView()  // Drawing all manager data.
         {
             using SqlCommand cmd = new SqlCommand(File.ReadAllText("RequestsSQL/ManagersPullRequest.sql"), _connection);
 
@@ -282,13 +272,13 @@ namespace ADO.NET
                     str += $"{reader.GetString(0)}  |  {reader[1]}  |  {reader[2]}\n";
                 reader.Close();
 
-                ViewManagers.Text = str;
+                TextBlock_Managers.Text = str;
             }
             catch (Exception ex) { MessageBox.Show(ex.Message, "Output error", MessageBoxButton.OK, MessageBoxImage.Error); }
         }
         #endregion
 
-        private void Window_Closed(object sender, EventArgs e)
+        private void Window_Closed(object sender, EventArgs e)  // Closing the connection.
         {
             if (_connection?.State == System.Data.ConnectionState.Open)
                 _connection.Close();

@@ -1,31 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-using System.IO;
-using ADO.NET.Entity;
-using System.Data;
 
 namespace ADO.NET
 {
     public partial class OrmWindow : Window
     {
-        private SqlConnection _connection;
+        private SqlConnection _connection;  // Сonnection type.
 
-        public ObservableCollection<Entity.Department> Departments { get; set; }
-        public ObservableCollection<Entity.Manager> Manager { get; set; }
-        public ObservableCollection<Entity.Product> Product { get; set; }
+        public ObservableCollection<Entity.Department> Departments { get; set; }  // Getting data from the department class.
+        public ObservableCollection<Entity.Product> Product { get; set; }  // Getting data from the product class.
+        public ObservableCollection<Entity.Manager> Manager { get; set; }  // Getting data from the manager class.
 
         public OrmWindow()
         {
@@ -38,7 +26,7 @@ namespace ADO.NET
             _connection = new SqlConnection(App._connection_string);
         }
 
-        private void Window_Loaded(object sender, RoutedEventArgs e)
+        private void Window_Loaded(object sender, RoutedEventArgs e)  // When loading a window, we pull data from the table.
         {
             try
             {
@@ -85,6 +73,7 @@ namespace ADO.NET
                 
                 reader.Close();
                 #endregion
+
                 cmd.Dispose();
             }
             catch (SqlException ex)
@@ -95,61 +84,125 @@ namespace ADO.NET
         }
 
         #region Events click.
-        private void DepartmentsListViewItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-            //if (sender is ListViewItem item)
-            //{
-            //    if (item.Content is Entity.Department departments)
-            //    {
-            //        CRUDWindow dialog = new CRUDWindow(departments);
-            //
-            //        if (dialog.ShowDialog() == true)
-            //        {
-            //            if (dialog.EditDepartment is null)  // delete.
-            //            {
-            //                Departments.Remove(departments);
-            //                MessageBox.Show($"Deleting {departments.Name}");
-            //
-            //            }
-            //            else
-            //            {
-            //                int index = Departments.IndexOf(departments);
-            //
-            //                Departments.Remove(departments);
-            //                Departments.Insert(index, departments);
-            //                MessageBox.Show($"Update {departments.Name}");
-            //            }
-            //        }
-            //        else  // Cancel.
-            //            MessageBox.Show("Asked");
-            //    }
-            //
-            //}
-        }
-
-
-        private void ManagerListViewItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        private void MouseDoubleClick_ListView_Departments(object sender, MouseButtonEventArgs e)  // Clicking opens the data editor window in the department table.
         {
             if (sender is ListViewItem item)
             {
-                if (item.Content is Entity.Manager managers)
-                    MessageBox.Show(managers.Surname);
+                if (item.Content is Entity.Department departments)
+                {
+                    CrudDepartment dialog = new CrudDepartment(departments);
+            
+                    if (dialog.ShowDialog() == true)
+                    {
+                        if (dialog.EditedDepartment is null)  // If delete.
+                        {
+                            Departments.Remove(departments);
+                            MessageBox.Show($"Deleting {departments.Name}", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+            
+                        }
+                        else  // If save.
+                        {
+                            int index = Departments.IndexOf(departments);
+            
+                            Departments.Remove(departments);
+                            Departments.Insert(index, departments);
+                            MessageBox.Show($"Update {departments.Name}", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+                        }
+                    }
+                }
             }
         }
 
-        private void ProductListViewItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        private void MouseDoubleClick_ListView_Products(object sender, MouseButtonEventArgs e)  // Clicking opens the data editor window in the product table.
         {
             if (sender is ListViewItem item)
             {
                 if (item.Content is Entity.Product product)
-                    MessageBox.Show($"{product.Name}   {product.Price}$");
+                {
+                    CrudProduct dialog = new CrudProduct(product);
+
+                    if (dialog.ShowDialog() == true)
+                    {
+                        if (dialog.EditProduct is null)  // If delete.
+                        {
+                            Product.Remove(product);
+                            MessageBox.Show($"Deleting {product.Name}", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                        }
+                        else  // If save.
+                        {
+                            int index = Product.IndexOf(product);
+
+                            Product.Remove(product);
+                            Product.Insert(index, product);
+                            MessageBox.Show($"Update {product.Name}", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+                        }
+                    }
+                }
             }
         }
-        #endregion
-
-        private void Add_Department_Click(object sender, RoutedEventArgs e)
+        
+        private void MouseDoubleClick_ListView_Manager(object sender, MouseButtonEventArgs e)  // Clicking opens the data editor window in the manager table.
         {
-            //CRUDWindow dialog = new CRUDWindow(null!);
+
         }
+        #endregion
+        #region Events add.
+        private void Click_Button_AddDepartment(object sender, RoutedEventArgs e)  // The method allows you to add data to the Departments table.
+        {
+            CrudDepartment dialog = new CrudDepartment(null!);
+
+            if (dialog.ShowDialog() == true)
+            {
+                if (dialog.EditedDepartment is not null)
+                {
+                    String sql = $"INSERT INTO Departments(Id, Name) VALUES (@id, @name)";
+                    using SqlCommand cmd = new SqlCommand(sql, _connection);
+
+                    cmd.Parameters.AddWithValue("@id", dialog.EditedDepartment.Id);
+                    cmd.Parameters.AddWithValue("@name", dialog.EditedDepartment.Name);
+
+                    try
+                    {
+                        cmd.ExecuteNonQuery();
+                        Departments.Add(dialog.EditedDepartment);
+                        MessageBox.Show("Add", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
+                    catch (Exception ex) { MessageBox.Show(ex.Message, "Warning", MessageBoxButton.OK, MessageBoxImage.Warning); }
+                }
+            }
+        }
+
+        private void Click_Button_AddProduct(object sender, RoutedEventArgs e)  // The method allows you to add data to the Products table.
+        {
+            CrudProduct dialog = new CrudProduct(null!);
+
+            if (dialog.ShowDialog() == true)
+            {
+                if (dialog.EditProduct is not null)
+                {
+                    String sql = $"INSERT INTO Products(Id, Name, Price) VALUES (@id, @name, @price)";
+                    using SqlCommand cmd = new SqlCommand(sql, _connection);
+
+                    cmd.Parameters.AddWithValue("@id", dialog.EditProduct.Id);
+                    cmd.Parameters.AddWithValue("@name", dialog.EditProduct.Name);
+                    cmd.Parameters.AddWithValue("@price", dialog.EditProduct.Price);
+
+                    try
+                    {
+                        cmd.ExecuteNonQuery();
+                        Product.Add(dialog.EditProduct);
+                        MessageBox.Show("Add", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
+                    catch (Exception ex) { MessageBox.Show(ex.Message, "Warning", MessageBoxButton.OK, MessageBoxImage.Warning); }
+                }
+            }
+        }
+
+        private void Click_Button_AddManager(object sender, RoutedEventArgs e)
+        {
+
+        }
+        #endregion
     }
 }

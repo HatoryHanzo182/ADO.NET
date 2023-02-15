@@ -8,12 +8,12 @@ namespace ADO.NET.Entity
 {
     public class Manager
     {
-        public Guid Id { get; set; }
-        public String? Surname { get; set; }
-        public String? Name { get; set; }
-        public String? Secname { get; set; }
-        public Guid IdMainDep { get; set; }
-        public Guid? IdSecDep { get; set; }
-        public Guid? IdChief { get; set; }
+        public Guid Id { get; set; }  // UNIQUEIDENTIFIER NOT NULL.
+        public String? Surname { get; set; }  // NVARCHAR(50).
+        public String? Name { get; set; }  // NVARCHAR(50).
+        public String? Secname { get; set; }  // NVARCHAR(50).
+        public Guid IdMainDep { get; set; }  // UNIQUEIDENTIFIER NOT NULL.
+        public Guid? IdSecDep { get; set; }  // UNIQUEIDENTIFIER REFERENCES.
+        public Guid? IdChief { get; set; }  // UNIQUEIDENTIFIER.
     }
 }

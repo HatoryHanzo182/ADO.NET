@@ -5,19 +5,17 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ADO.NET"
         mc:Ignorable="d"
-        Title="OrmWindow" Height="450" Width="800" Loaded="Window_Loaded">
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="223*"/>
-            <RowDefinition Height="211*"/>
-        </Grid.RowDefinitions>
+        Title="OrmWindow" Height="431" Width="1576" Loaded="Window_Loaded">
+    <Grid Margin="0,0,0,1" HorizontalAlignment="Center" Width="1576">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="401*"/>
-            <ColumnDefinition Width="399*"/>
+            <ColumnDefinition Width="524*"/>
+            <ColumnDefinition Width="529*"/>
+            <ColumnDefinition Width="523*"/>
         </Grid.ColumnDefinitions>
-        <StackPanel Margin="0,0,0,11">
-            <Label Content="Departments" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center"/>
-            <ListView Height="155" ItemsSource="{Binding Departments}" Width="398" MouseDoubleClick="DepartmentsListViewItem_MouseDoubleClick">
+        <!--Department-->
+        <StackPanel>
+            <Label Content="Departments" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            <ListView Height="334" ItemsSource="{Binding Departments}" MouseDoubleClick="MouseDoubleClick_ListView_Departments" Width="510">
                 <ListView.View>
                     <GridView>
                         <GridViewColumn Header="Id" DisplayMemberBinding="{Binding Path=Id}"/>
@@ -26,26 +24,35 @@
                 </ListView.View>
                 <ListView.Resources>
                     <Style TargetType="{x:Type ListViewItem}">
-                        <EventSetter Event="MouseDoubleClick" Handler="DepartmentsListViewItem_MouseDoubleClick"/>
+                        <EventSetter Event="MouseDoubleClick" Handler ="MouseDoubleClick_ListView_Departments"/>
                     </Style>
                 </ListView.Resources>
             </ListView>
-            <Button x:Name="Add_Department" Content="Add department" Click="Add_Department_Click" RenderTransformOrigin="0.5,0.5" Height="20" Width="397">
-                <Button.RenderTransform>
-                    <TransformGroup>
-                        <ScaleTransform/>
-                        <SkewTransform/>
-                        <RotateTransform Angle="-0.21"/>
-                        <TranslateTransform/>
-                    </TransformGroup>
-                </Button.RenderTransform>
-            </Button>
+            <Button x:Name="Button_AddDepartment" Content="Add department" Height="21" Click="Click_Button_AddDepartment" Width="510"/>
         </StackPanel>
-
-
-        <StackPanel Height="211" Grid.Row="1" VerticalAlignment="Center" Margin="0,0,1,0">
-            <Label Content="Managers" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center"/>
-            <ListView Height="172" ItemsSource="{Binding Manager}" Width="398" MouseDoubleClick="ManagerListViewItem_MouseDoubleClick">
+        <!--Product-->
+        <StackPanel Grid.Column="1">
+            <Label Content="Products" FontSize="20" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+            <ListView Height="334" ItemsSource="{Binding Product}" MouseDoubleClick="MouseDoubleClick_ListView_Products" Width="510" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="Id" DisplayMemberBinding="{Binding Path=Id}"/>
+                        <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Path=Name}"/>
+                        <GridViewColumn Header="Price" DisplayMemberBinding="{Binding Path=Price}"/>
+                    </GridView>
+                </ListView.View>
+                <ListView.Resources>
+                    <Style TargetType="{x:Type ListViewItem}">
+                        <EventSetter Event="MouseDoubleClick" Handler="MouseDoubleClick_ListView_Products"/>
+                    </Style>
+                </ListView.Resources>
+            </ListView>
+            <Button x:Name="Button_AddProduct" Content="Add prodect" Height="21" Click="Click_Button_AddProduct" Width="510"/>
+        </StackPanel>
+        <!--Manager-->
+        <StackPanel Grid.Column="2" Margin="5,0,0,0">
+            <Label Content="Managers" FontSize="20" FontWeight="Bold" Height="36" Width="104" HorizontalAlignment="Center"/>
+            <ListView Height="334" ItemsSource="{Binding Manager}" Width="510" MouseDoubleClick="MouseDoubleClick_ListView_Manager">
                 <ListView.View>
                     <GridView>
                         <GridViewColumn Header="Id" DisplayMemberBinding="{Binding Path=Id}"/>
@@ -56,30 +63,11 @@
                 </ListView.View>
                 <ListView.Resources>
                     <Style TargetType="{x:Type ListViewItem}">
-                        <EventSetter Event="MouseDoubleClick" Handler="ManagerListViewItem_MouseDoubleClick"/>
+                        <EventSetter Event="MouseDoubleClick" Handler="MouseDoubleClick_ListView_Manager"/>
                     </Style>
                 </ListView.Resources>
             </ListView>
-        </StackPanel>
-
-
-
-        <StackPanel Grid.Column="1">
-            <Label Content="Products" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center"/>
-            <ListView Height="156" ItemsSource="{Binding Product}" MouseDoubleClick="ProductListViewItem_MouseDoubleClick" Width="393">
-                <ListView.View>
-                    <GridView>
-                        <GridViewColumn Header="Id" DisplayMemberBinding="{Binding Path=Id}"/>
-                        <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Path=Name}"/>
-                        <GridViewColumn Header="Price" DisplayMemberBinding="{Binding Path=Price}"/>
-                    </GridView>
-                </ListView.View>
-                <ListView.Resources>
-                    <Style TargetType="{x:Type ListViewItem}">
-                        <EventSetter Event="MouseDoubleClick" Handler="ProductListViewItem_MouseDoubleClick"/>
-                    </Style>
-                </ListView.Resources>
-            </ListView>
+            <Button x:Name="Button_AddManager" Content="Add manager" Height="21" Width="510" Click="Click_Button_AddManager"/>
         </StackPanel>
     </Grid>
 </Window>

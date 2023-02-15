@@ -8,8 +8,8 @@ namespace ADO.NET.Entity
 {
     public class Product
     {
-        public Guid Id { get; set; }
-        public String? Name { get; set; }
-        public double Price { get; set; }
+        public Guid Id { get; set; }  // UNIQUEIDENTIFIER NOT NULL.
+        public String? Name { get; set; }  // NVARCHAR(50).
+        public double Price { get; set; }  // FLOAT  NOT NULL.
     }
 }

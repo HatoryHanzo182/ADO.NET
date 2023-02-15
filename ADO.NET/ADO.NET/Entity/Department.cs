@@ -8,7 +8,7 @@ namespace ADO.NET.Entity
 {
     public class Department
     {
-        public Guid Id { get; set; }  // Id UNIQUEIDENTIFITI.
-        public String? Name { get; set; }  // Name NWARCHAR(50).
+        public Guid Id { get; set; }  // UNIQUEIDENTIFIER NOT NULL.
+        public String? Name { get; set; }  // NVARCHAR(50).
     }
 }
