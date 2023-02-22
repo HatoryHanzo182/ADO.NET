@@ -14,14 +14,16 @@ namespace ADO.NET
         public ObservableCollection<Entity.Department> Departments { get; set; }  // Getting data from the department class.
         public ObservableCollection<Entity.Product> Product { get; set; }  // Getting data from the product class.
         public ObservableCollection<Entity.Manager> Manager { get; set; }  // Getting data from the manager class.
+        public ObservableCollection<Entity.Sale> Sale { get; set; }  // Getting data from the sale class.
 
         public OrmWindow()
         {
             InitializeComponent();
 
             Departments = new ObservableCollection<Entity.Department>();
-            Manager = new ObservableCollection<Entity.Manager>();
             Product = new ObservableCollection<Entity.Product>();
+            Manager = new ObservableCollection<Entity.Manager>();
+            Sale = new ObservableCollection<Entity.Sale>();
             DataContext = this;  // {Binding Departments}
             _connection = new SqlConnection(App._connection_string);
         }
@@ -44,6 +46,15 @@ namespace ADO.NET
 
                 reader.Close();
                 #endregion
+                #region Load Product.
+                cmd.CommandText = "SELECT P.* FROM Products as P WHERE P.DeleteData IS NULL";
+                reader= cmd.ExecuteReader();
+                
+                while (reader.Read())
+                    Product.Add(new Entity.Product(reader));
+                
+                reader.Close();
+                #endregion
                 #region Load Manager.
                 cmd.CommandText = "SELECT M.Id, M.Surname, M.Name, M.Secname, M.Id_main_Dep, M.Id_sec_dep, M.Id_chief FROM Managers as M";
                 reader = cmd.ExecuteReader();
@@ -59,21 +70,20 @@ namespace ADO.NET
                         IdMainDep = reader.GetGuid(4),
                         IdSecDep = reader.GetValue(5) == DBNull.Value ? null : reader.GetGuid(5),
                         IdChief = reader.IsDBNull(6) ? null : reader.GetGuid(6)
-                    }); 
+                    });
                 }
 
                 reader.Close();
                 #endregion
-                #region Load Product.
-                cmd.CommandText = "SELECT P.Id, P.Name, P.Price FROM Products as P";
-                reader= cmd.ExecuteReader();
-                
+                #region Load Sale.
+                cmd.CommandText = "SELECT S.* FROM Sales as S";
+                reader = cmd.ExecuteReader();
+
                 while (reader.Read())
-                    Product.Add(new Entity.Product() { Id = reader.GetGuid(0), Name = reader.GetString(1), Price = reader.GetDouble(2) });
-                
+                    Sale.Add(new Entity.Sale(reader));
+
                 reader.Close();
                 #endregion
-
                 cmd.Dispose();
             }
             catch (SqlException ex)
@@ -125,8 +135,18 @@ namespace ADO.NET
                     {
                         if (dialog.EditProduct is null)  // If delete.
                         {
-                            Product.Remove(product);
-                            MessageBox.Show($"Deleting {product.Name}", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+                            using SqlCommand cmd = new SqlCommand() { Connection = _connection };
+
+                            cmd.CommandText = "UPDATE Products SET DeleteData = CURRENT_TIMESTAMP WHERE Id = @Id";
+                            cmd.Parameters.AddWithValue("@Id", product.Id);
+
+                            try
+                            {
+                                cmd.ExecuteNonQuery();
+                                Product.Remove(product);
+                                MessageBox.Show($"Deleting {product.Name}", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+                            }
+                            catch (Exception ex) { MessageBox.Show(ex.Message, "Warning", MessageBoxButton.OK, MessageBoxImage.Warning); }
 
                         }
                         else  // If save.
@@ -143,6 +163,22 @@ namespace ADO.NET
         }
         
         private void MouseDoubleClick_ListView_Manager(object sender, MouseButtonEventArgs e)  // Clicking opens the data editor window in the manager table.
+        {
+            if (sender is ListViewItem item)
+            {
+                if (item.Content is Entity.Manager manager)
+                {
+                    CrudManager dialog = new CrudManager(manager) { Owner = this };
+
+                    if (dialog.ShowDialog() == true)
+                    {
+
+                    }
+                }
+            }
+        }
+
+        private void MouseDoubleClick_ListView_Sale(object sender, MouseButtonEventArgs e)  // Clicking opens the data editor window in the Sale table.
         {
 
         }
@@ -202,6 +238,30 @@ namespace ADO.NET
         private void Click_Button_AddManager(object sender, RoutedEventArgs e)
         {
 
+        }
+
+
+        private void Click_Button_AddSale(object sender, RoutedEventArgs e)  // The method allows you to add data to the Sales table.
+        {
+            CrudSale dialog = new CrudSale(null!) { Owner = this };
+            
+            if (dialog.ShowDialog() == true && dialog.EditSale is not null)
+            {
+                using SqlCommand cmd = new SqlCommand($"INSERT INTO Sales (Id, ProductId, ManagerId, Cnt, SaleDt) VALUES (@Id, @ProductId, @ManagerId, @Cnt, @SaleDt)", _connection);
+                cmd.Parameters.AddWithValue("@Id", dialog.EditSale.Id);
+                cmd.Parameters.AddWithValue("@ManagerId", dialog.EditSale.IdManager);
+                cmd.Parameters.AddWithValue("@ProductId", dialog.EditSale.IdProduct);
+                cmd.Parameters.AddWithValue("@Cnt", dialog.EditSale.Cnt);
+                cmd.Parameters.AddWithValue("@SaleDt", dialog.EditSale.SaleDt);
+
+                try
+                {
+                    cmd.ExecuteNonQuery();
+                    Sale.Add(dialog.EditSale);
+                    MessageBox.Show("Add true");
+                }
+                catch (Exception ex) { MessageBox.Show(ex.Message); }
+            }
         }
         #endregion
     }

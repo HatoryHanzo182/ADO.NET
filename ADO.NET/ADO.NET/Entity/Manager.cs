@@ -8,6 +8,14 @@ namespace ADO.NET.Entity
 {
     public class Manager
     {
+        public Manager() 
+        {
+            Id = Guid.NewGuid();
+            Surname = null!;
+            Name = null!;
+            Secname = null!;
+        }
+
         public Guid Id { get; set; }  // UNIQUEIDENTIFIER NOT NULL.
         public String? Surname { get; set; }  // NVARCHAR(50).
         public String? Name { get; set; }  // NVARCHAR(50).
