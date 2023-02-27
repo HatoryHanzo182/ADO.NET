@@ -88,10 +88,16 @@ namespace ADO.NET
             if (ComboBox_Product.SelectedItem is Entity.Product product)
                 this.EditSale.IdProduct = product.Id;
             if (ComboBox_Manager.SelectedItem is Entity.Manager manager)
-                this.EditSale.IdProduct = manager.Id;
+                this.EditSale.IdManager = manager.Id;
             this.DialogResult = true;
         }
-        private void Click_Button_Delete(object sender, RoutedEventArgs e) => this.DialogResult = true;
+        
+        private void Click_Button_Delete(object sender, RoutedEventArgs e)
+        {
+            EditSale = null!;
+            this.DialogResult = true;
+        }
+
         private void Click_Button_Cancel(object sender, RoutedEventArgs e) => this.DialogResult = false;
     }
 }

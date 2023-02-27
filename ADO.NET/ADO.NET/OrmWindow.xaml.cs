@@ -180,7 +180,41 @@ namespace ADO.NET
 
         private void MouseDoubleClick_ListView_Sale(object sender, MouseButtonEventArgs e)  // Clicking opens the data editor window in the Sale table.
         {
+            if (sender is ListViewItem item)
+            {
+                if (item.Content is Entity.Sale sale)
+                {
+                    CrudSale dialog = new CrudSale(sale) { Owner = this };
 
+                    if (dialog.ShowDialog() == true)
+                    {
+                        if (dialog.EditSale is null)  // If delete.
+                        {
+                            using SqlCommand cmd = new SqlCommand() { Connection = _connection };
+
+                            cmd.CommandText = "UPDATE Sales SET DeleteDt = CURRENT_TIMESTAMP WHERE Id = @Id";
+                            cmd.Parameters.AddWithValue("@Id", sale.Id);
+
+                            try
+                            {
+                                cmd.ExecuteNonQuery();
+                                Sale.Remove(sale);
+                                MessageBox.Show($"Deleting {sale.IdProduct}", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+                            }
+                            catch (Exception ex) { MessageBox.Show(ex.Message, "Warning", MessageBoxButton.OK, MessageBoxImage.Warning); }
+
+                        }
+                        else  // If save.
+                        {
+                            int index = Sale.IndexOf(sale);
+
+                            Sale.Remove(sale);
+                            Sale.Insert(index, sale);
+                            MessageBox.Show($"Update {sale.IdProduct}", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+                        }
+                    }
+                }
+            }
         }
         #endregion
         #region Events add.

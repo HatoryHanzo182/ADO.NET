@@ -22,5 +22,12 @@ namespace ADO.NET
             new OrmWindow().ShowDialog();
             this.Show();
         }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            this.Hide();
+            new DalWindow().ShowDialog();
+            this.Show();
+        }
     }
 }

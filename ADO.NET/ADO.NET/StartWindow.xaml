@@ -12,6 +12,7 @@
             <Label x:Name="Label_Header" Content="ADO.NET" FontSize="24" FontWeight="DemiBold" Width="111"/>
             <Button x:Name="Button_Basics" Content="1.Introduction to the basics" Margin="20 10" Padding="15 5" HorizontalAlignment="Center" Click="Click_Button_Basics" Width="363" Height="26"/>
             <Button x:Name="Button_Orm" Content="2.Orm display" Margin="20 10" Padding="15 5" HorizontalAlignment="Center" Click="Click_Button_Orm" Width="363"/>
+            <Button Content="3.DAL" Width="365" Height="28" Click="Button_Click"/>
         </StackPanel>
     </Grid>
 </Window>
