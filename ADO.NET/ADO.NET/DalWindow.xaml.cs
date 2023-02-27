@@ -21,6 +21,7 @@ namespace ADO.NET
 {
     public partial class DalWindow : Window
     {
+        private SqlConnection _connection;
         private readonly DataContext _context;
         public ObservableCollection<Entity.Department> DepartmentsList { get; set; }
 
@@ -29,14 +30,12 @@ namespace ADO.NET
             InitializeComponent();
 
             _context = new DataContext();
-            DepartmentsList= new ObservableCollection<Entity.Department>(_context.Departments.GetAll());
+            DepartmentsList = new ObservableCollection<Entity.Department>(_context.Departments.GetAll());
+            _connection = new SqlConnection(App._connection_string);
             this.DataContext= this;
         }
 
-        private void Window_Loaded(object sender, RoutedEventArgs e)
-        {
-            
-        }
+        private void Window_Loaded(object sender, RoutedEventArgs e) => _connection.Open();
 
         private void MouseDoubleClick_ListView_Departments(object sender, MouseButtonEventArgs e)
         {
@@ -70,6 +69,27 @@ namespace ADO.NET
         private void Button_AddDepartment_Click(object sender, RoutedEventArgs e)
         {
             CrudDepartment dialog = new CrudDepartment(null!);
+
+            if (dialog.ShowDialog() == true)
+            {
+                if (dialog.EditedDepartment is not null)
+                {
+                    using SqlCommand cmd = new SqlCommand($"INSERT INTO Departments(Id, Name) VALUES (@id, @name)", _connection);
+
+                    cmd.Parameters.AddWithValue("@id", dialog.EditedDepartment.Id);
+                    cmd.Parameters.AddWithValue("@name", dialog.EditedDepartment.Name);
+
+                    try
+                    {
+                        cmd.ExecuteNonQuery();
+                        DepartmentsList.Add(dialog.EditedDepartment);
+                        MessageBox.Show("Add new depatments", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
+                    catch (Exception ex) { MessageBox.Show(ex.Message, "Warning", MessageBoxButton.OK, MessageBoxImage.Warning); }
+                }
+            }
         }
+
+        private void Window_Closed(object sender, EventArgs e) => _connection.Close();
     }
 }
