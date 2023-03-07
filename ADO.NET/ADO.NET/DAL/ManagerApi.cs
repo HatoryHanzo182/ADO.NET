@@ -2,6 +2,7 @@
 using ADO.NET.Service;
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Reflection;
@@ -10,44 +11,37 @@ using System.Threading.Tasks;
 
 namespace ADO.NET.DAL
 {
-    internal class DepartmentAPI
+    internal class ManagerApi
     {
         private readonly SqlConnection _connection;
         private readonly ILogger _logger;
         private readonly DataContext _context;
 
-        private List<Department> _departments;
-
-        public DepartmentAPI(SqlConnection connection, DataContext context)
+        public ManagerApi(SqlConnection connection, DataContext context)
         {
             _connection = connection;
             this._logger = App._logger;
-            _departments = null!;  // Lazy.
             _context = context;
         }
-
-
-        public List<Entity.Department> GetAll(bool force_reload = false)
+        
+        public List<Entity.Manager> GetAll(bool include_delete = false)
         {
-            if (_departments is not null && !force_reload)
-                return _departments;
-            
-            _departments = new List<Department>();
-            
+            var manager = new List<Entity.Manager>();
+
             try
             {
-                using SqlCommand command = new("SELECT D.* FROM Departments D", _connection);
+                using SqlCommand command = new SqlCommand("SELECT M.* FROM Managers M " + (include_delete ? "" : "WHERE M.FiredDt IS NULL"), _connection);
                 using var reader = command.ExecuteReader();
-                
+
 
                 while (reader.Read())
-                    _departments.Add(new Department(reader));
+                    manager.Add(new Manager(reader) { DataContext = _context});
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 this._logger.Log(ex.Message, "SERVER", this.GetType().Name, MethodInfo.GetCurrentMethod()?.Name ?? "");
             }
-            return _departments;
+            return manager;
         }
     }
 }

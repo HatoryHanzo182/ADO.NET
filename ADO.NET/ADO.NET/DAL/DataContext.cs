@@ -11,6 +11,7 @@ namespace ADO.NET.DAL
     internal class DataContext
     {
         internal DepartmentAPI Departments;
+        internal ManagerApi Managers;
         private readonly SqlConnection _connection;
 
         public DataContext()
@@ -24,7 +25,8 @@ namespace ADO.NET.DAL
                 throw new Exception("Data context init error. See loga for details");
             }
 
-            Departments = new DepartmentAPI(_connection);
+            //Departments = new DepartmentAPI(_connection);
+            Managers = new ManagerApi(_connection, this);
         }
     }
 }

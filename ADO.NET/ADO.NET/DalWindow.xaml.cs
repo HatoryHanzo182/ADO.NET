@@ -24,6 +24,8 @@ namespace ADO.NET
         private SqlConnection _connection;
         private readonly DataContext _context;
         public ObservableCollection<Entity.Department> DepartmentsList { get; set; }
+        public ObservableCollection<Entity.Manager> ManagersList { get; set; }
+
 
         public DalWindow()
         {
@@ -31,6 +33,7 @@ namespace ADO.NET
 
             _context = new DataContext();
             DepartmentsList = new ObservableCollection<Entity.Department>(_context.Departments.GetAll());
+            ManagersList = new ObservableCollection<Entity.Manager>(_context.Managers.GetAll());
             _connection = new SqlConnection(App._connection_string);
             this.DataContext= this;
         }
@@ -65,6 +68,10 @@ namespace ADO.NET
             }
         }
 
+        private void MouseDoubleClick_ListView_Manager(object sender, MouseButtonEventArgs e)
+        {
+
+        }
 
         private void Button_AddDepartment_Click(object sender, RoutedEventArgs e)
         {
@@ -87,6 +94,15 @@ namespace ADO.NET
                     }
                     catch (Exception ex) { MessageBox.Show(ex.Message, "Warning", MessageBoxButton.OK, MessageBoxImage.Warning); }
                 }
+            }
+        }
+
+        private void Button_AddManager_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is ListViewItem item)
+            {
+                if (item.Content is Entity.Manager manager)
+                    MessageBox.Show(manager.Name);
             }
         }
 

@@ -29,5 +29,12 @@ namespace ADO.NET
             new DalWindow().ShowDialog();
             this.Show();
         }
+
+        private void Button_Click_EF(object sender, RoutedEventArgs e)
+        {
+            this.Hide();
+            new EFWindow().ShowDialog();
+            this.Show();
+        }
     }
 }
