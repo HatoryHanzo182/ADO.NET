@@ -11,5 +11,6 @@ namespace ADO.NET.EFCore
     {
         public Guid Id { get; set; }  // UNIQUEIDENTIFIER NOT NULL.
         public String? Name { get; set; }  // NVARCHAR(50).
+        public DateTime? DeleteDt { get; set; }
     }
 }
